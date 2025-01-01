@@ -1,8 +1,8 @@
 class User:
     # get user id and json file(data) or properties
     def __init__(self, user_id, username=None, password=None, t_fullname=None, t_birthdate=None, t_phone=None, p_fullname=None, p_contact=None, data=None):
+        self.id = user_id
         if isinstance(data, dict): 
-            self.id = data.get("id", user_id)
             self.username = data.get("username", username)
             self.password = data.get("password", password)
             self.t_fullname = data.get("t_fullname", t_fullname)
@@ -11,7 +11,6 @@ class User:
             self.p_fullname = data.get("p_fullname", p_fullname)
             self.p_contact = data.get("p_contact", p_contact)
         else:
-            self.id = user_id
             self.username = username
             self.password = password
             self.t_fullname = t_fullname
