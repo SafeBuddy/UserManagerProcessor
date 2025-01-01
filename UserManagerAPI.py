@@ -27,7 +27,3 @@ def update_user(user_id):
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     return 'User deleted'
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
