@@ -18,7 +18,7 @@ def initialize_users():
             "t_birthdate": "2012-02-03",
             "t_phone": "0526547890",
             "p_fullname": "John Fade Willson",
-            "p_contact": "0504655897",
+            "p_contact": "john.willson@gmail.com",
         },
         {
             "username": "katedoe",
@@ -27,13 +27,13 @@ def initialize_users():
             "t_birthdate": "2010-05-10",
             "t_phone": "0527700112",
             "p_fullname": "Dan Joe Doe",
-            "p_contact": "0548869364",
+            "p_contact": "dan.doe@gmail.com",
         },
     ]
     for user_data in init_users:
         user_id_count += 1
         user1 = user.User(user_id_count, **user_data)
-        users_dict[user_id_count] = user1
+        users_dict[user1.username] = user1
 
 initialize_users()
 
@@ -44,12 +44,16 @@ def create_user():
     global user_id_count
     data = request.get_json()
     if not data:
-        return jsonify({'eror':'No input data provided'}),400
+        return jsonify({'error':'No input data provided'}),400
+
+    username = data.get("username")
+    if username in users_dict:
+        return jsonify({'error': 'Username already exists'}), 400
 
     user_id_count += 1
     user1 = user.User(
         user_id = user_id_count,
-        username=data.get("username"),
+        username= username,
         password=data.get("password"),
         t_fullname=data.get("t_fullname"),
         t_birthdate=data.get("t_birthdate"),
@@ -57,14 +61,14 @@ def create_user():
         p_fullname=data.get("p_fullname"),
         p_contact=data.get("p_contact"),
     )
-    users_dict[user_id_count] = user1
+    users_dict[username] = user1
     return jsonify(user1.to_dict()), 201
 
-# Read user by ID
+# Read user by username
 #get id, return json of user  
-@app.route('/users/<int:user_id>', methods=['GET'])
-def get_user(user_id):
-    user1 = users_dict.get(user_id)
+@app.route('/users/<string:username>', methods=['GET'])
+def get_user(username):
+    user1 = users_dict.get(username)
     if not user1:
         return jsonify({'error': 'User not found'}), 404
     return jsonify(user1.to_dict()), 200
@@ -72,18 +76,17 @@ def get_user(user_id):
 
 # Update user
 #get id and date , update user, return new json user
-@app.route('/users/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
-    user1 = users_dict.get(user_id)
+@app.route('/users/<string:username>', methods=['PUT'])
+def update_user(username):
+    user1 = users_dict.get(username)
     if not user1:
         return jsonify({'error': 'User not found'}), 404
 
     data = request.get_json()
     if not data:
-        return jsonify({'eror': 'No input data provided'}), 400
+        return jsonify({'error': 'No input data provided'}), 400
 
     #Updating user data
-    user1.username = data.get("username", user1.username)
     user1.password = data.get("password", user1.password)
     user1.t_fullname = data.get("t_fullname", user1.t_fullname)
     user1.t_birthdate = data.get("t_birthdate", user1.t_birthdate)
@@ -96,9 +99,9 @@ def update_user(user_id):
 
 # Delete user
 #get id, delete user, return message 
-@app.route('/users/<int:user_id>', methods=['DELETE'])
-def delete_user(user_id):
-    user1 = users_dict.pop(user_id, None)
+@app.route('/users/<string:username>', methods=['DELETE'])
+def delete_user(username):
+    user1 = users_dict.pop(username, None)
     if not user1:
         return jsonify({'error': 'User not found'}), 404
     return jsonify({'message': 'User Deleted!'})
