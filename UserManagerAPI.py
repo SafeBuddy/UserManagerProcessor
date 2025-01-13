@@ -96,6 +96,29 @@ def update_user(username):
 
     return jsonify(user1.to_dict()), 200
 
+# Authenticate User
+# get username and password, authenticate user, return json with message and username
+@app.route('/authenticate', methods=['POST'])
+def authenticate_user():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No input data provided'}), 400
+    
+    username = data.get("username")
+    password = data.get("password")
+
+    if not username or not password:
+        return jsonify({'error': 'Username and password are required'}), 400
+    
+    user1 = users_dict.get(username)
+    if not user1:
+        return jsonify({'error': 'Invalid username'}), 404
+    
+    if user1.password != password:
+        return jsonify({'error': 'Invalid password'}), 400
+    
+    return jsonify({'message': 'User authenticated successfully', 'username' : username}), 200
+
 
 # Delete user
 #get id, delete user, return message 
@@ -106,3 +129,5 @@ def delete_user(username):
         return jsonify({'error': 'User not found'}), 404
     return jsonify({'message': 'User Deleted!'})
 
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=6000)
